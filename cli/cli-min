@@ -1,0 +1,79 @@
+#!/bin/bash
+
+
+# ----------------------------------------------------------------------------
+readonly AUTHOR="Mikael Flora"
+readonly MAINTAINER="<https://github.com/mikaelflora/project/issues>"
+readonly APPLICATION=${0##*/}
+readonly VERSION="0.1"
+readonly DATE="YYYY-mm-dd"
+readonly LICENSE="GPLv3"
+readonly BRIEF="Description"
+# ----------------------------------------------------------------------------
+
+
+# cli functions -->
+cli.version () {
+  echo "\
+${APPLICATION} v${VERSION} (${DATE})
+
+Licence ${LICENSE}. Written by ${AUTHOR}."
+ 
+  exit 0
+}
+
+cli.usage () {
+  echo "\
+Synopsis:
+  ${BRIEF}.
+
+Usage:
+  ${APPLICATION} [-h | -v]
+
+Options:
+  -h
+    display this help and exit
+  -v
+    display version information and exit
+
+Examples:
+  ${APPLICATION}
+
+Bugs:
+  Bug reports to ${MAINTAINER}."
+
+  exit 0
+}
+
+cli.error () {
+  [ -n "${*}" ] && echo "${*}"
+
+  echo "get more information with \`${APPLICATION} -h\`"
+
+  exit 1
+}
+# cli functions <--
+
+
+# parse cli -->
+while getopts ":hv" option; do
+  case ${option} in
+    h) cli.usage ;;
+    v) cli.version ;;
+    :) cli.error "-${OPTARG}: required an argument" ;;
+    \?) cli.error "-${OPTARG}: unknown option" ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+[ ${#} -eq 0 ] && cli.error "arguments expected" || params=${*}
+# parse cli <--
+
+
+# main -->
+
+# main <--
+
+
+exit 0
