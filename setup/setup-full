@@ -1,0 +1,87 @@
+#!/bin/sh
+
+
+# ----------------------------------------------------------------------------
+readonly SETUP=${0##*/}
+readonly APPLICATION='name'
+readonly PREREQUISITES='bash'
+# ----------------------------------------------------------------------------
+
+
+# run as root -->
+if [ "$USER" != 'root' ]; then
+  [ "$LOGNAME" != 'root' ] && echo "Please run as root" && exit 1
+fi
+# run as root <--
+
+
+# setup functions -->
+setup_usage () {
+  rc=0
+  [ -n "${*}" ] && echo "${*}\n" && rc=1
+  echo "\
+Usage:
+  $SETUP argument
+
+Arguments:
+  help
+    display this help and exit
+  requirement
+    display prerequisite external commands
+  configure
+    pre-install tasks
+  install
+    install '$APPLICATION'
+  uninstall
+    uninstall '$APPLICATION'
+
+Exemples:
+  $SETUP configure
+  $SETUP install"
+
+  exit $rc
+}
+
+setup_prerequisites () {
+  echo "$PREREQUISITES"
+
+  exit 0
+}
+
+setup_check_prerequisites () {
+  for cmd in $PREREQUISITES; do
+    command -v $cmd >/dev/null
+    [ $? -ne 0 ] && echo "you need the '$cmd' command" && exit 1
+  done
+}
+
+setup_configure () {
+  echo "configure"
+}
+
+setup_install () {
+  echo "install"
+}
+
+setup_uninstall () {
+  echo "uninstall"
+}
+# setup functions <--
+
+
+# parse cli -->
+case $1 in
+  help)        setup_usage         ;;
+  requirement) setup_prerequisites ;;
+  configure)   setup_configure     ;;
+  install)
+    setup_check_prerequisites
+    setup_install
+    ;;
+  uninstall)   setup_uninstall     ;;
+  *)         setup_usage 'invalid or missing argument' ;;
+esac
+# parse cli <--
+
+
+exit 0
