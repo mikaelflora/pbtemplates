@@ -11,14 +11,20 @@ Personnal Bash templates
 ├── cli/
 │   ├── cli-main
 │   └── cli-min
-└── setup/
-    ├── setup-full
-    ├── setup-main
-    └── setup-min
+├── readme/
+│   └── README.md
+├── setup/
+│   ├── setup-full
+│   ├── setup-main
+│   └── setup-min
+└── ui/
+    └── ui.bash
 ```
 
   - **cli:** applications (`./cli [-h | -v]`)
+  - **readme:** README files
   - **setup:** installation scripts (`./setup install`)
+  - **ui:** user interface functions
 
 ## License
 
