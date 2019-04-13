@@ -5,20 +5,12 @@
 readonly SETUP=${0##*/}
 readonly APPLICATION='name'
 readonly PREREQUISITES='bash'
+readonly PLATFORMS='debian ubuntu'
 # ----------------------------------------------------------------------------
-
-
-# run as root -->
-if [ "$USER" != 'root' ]; then
-  [ "$LOGNAME" != 'root' ] && echo "Please run as root" && exit 1
-fi
-# run as root <--
 
 
 # setup functions -->
 setup_usage () {
-  rc=0
-  [ -n "${*}" ] && echo "${*}\n" && rc=1
   echo "\
 Usage:
   $SETUP argument
@@ -39,19 +31,49 @@ Exemples:
   $SETUP configure
   $SETUP install"
 
-  exit $rc
+  exit 0
+}
+
+setup_error () {
+  [ -n "${*}" ] && echo "${*}"
+
+  exit 1
 }
 
 setup_prerequisites () {
-  echo "$PREREQUISITES"
+  echo "\
+Prerequisites: $PREREQUISITES
+Supported platforms: $PLATFORMS"
 
   exit 0
 }
 
 setup_check_prerequisites () {
+  if [ -f /etc/os-release ]; then
+    # get OS
+    os='false'
+    while IFS='=' read -r key value; do
+      if [ "$key" = 'ID' ]; then
+        os=$value
+        break
+      fi
+    done < /etc/os-release
+    # check if OS is supported
+    for platform in $PLATFORMS; do
+      if [ "$os" = "$platform" ]; then
+        os='true'
+        break
+      fi
+    done
+    # abort if OS is unsupported
+    if [ "$os" != 'true' ]; then
+      setup_error 'unsupported OS'
+    fi
+  fi
+
   for cmd in $PREREQUISITES; do
     command -v $cmd >/dev/null
-    [ $? -ne 0 ] && echo "you need the '$cmd' command" && exit 1
+    [ $? -ne 0 ] && setup_error "you need the '$cmd' command"
   done
 }
 
@@ -69,6 +91,13 @@ setup_uninstall () {
 # setup functions <--
 
 
+# run as root -->
+if [ "$USER" != 'root' ]; then
+  [ "$LOGNAME" != 'root' ] && setup_error "please run as root"
+fi
+# run as root <--
+
+
 # parse cli -->
 case $1 in
   help)        setup_usage         ;;
@@ -76,10 +105,9 @@ case $1 in
   configure)   setup_configure     ;;
   install)
     setup_check_prerequisites
-    setup_install
-    ;;
+    setup_install                  ;;
   uninstall)   setup_uninstall     ;;
-  *)         setup_usage 'invalid or missing argument' ;;
+  *)           setup_error 'invalid or missing argument' ;;
 esac
 # parse cli <--
 
