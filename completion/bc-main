@@ -1,0 +1,29 @@
+#
+# completion for name:
+#   name [-D] [-o] [-p params] params
+#   name [-h | v]
+#
+
+_name ()
+{
+  local cur prev opts args
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts="-h -v -D -o -p"
+  params="foo bar"
+
+  case "${prev}" in
+    -h|-v) return 0 ;;
+    -p)
+      local p_params="aa bb"
+      COMPREPLY=( $(compgen -W "${p_params}" -- ${cur}) )
+      return 0 ;;
+    *) ;;
+  esac
+
+  COMPREPLY=( $(compgen -W "${opts} ${params}" -- ${cur}) )
+  return 0
+}
+
+complete -F _name name

@@ -1,0 +1,25 @@
+#
+# completion for name:
+#   name args
+#   name [-h | v]
+#
+
+_name ()
+{
+  local cur prev opts args
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts="-h -v"
+  args="foo bar"
+
+  case "${prev}" in
+    -h|-v) return 0 ;;
+    *) ;;
+  esac
+
+  COMPREPLY=( $(compgen -W "${opts} ${args}" -- ${cur}) )
+  return 0
+}
+
+complete -F _name name

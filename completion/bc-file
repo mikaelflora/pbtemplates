@@ -1,0 +1,24 @@
+#
+# completion for name:
+#   name files
+#   name [-h | v]
+#
+
+_name ()
+{
+  local cur prev opts
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts="-h -v"
+
+  if [[ ${cur} == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+  fi
+
+  COMPREPLY=( $(compgen -W "${opts}" -f ${cur} -- ${cur}) )
+  return 0
+}
+
+complete -F _name name
